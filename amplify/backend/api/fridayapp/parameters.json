@@ -1,0 +1,11 @@
+{
+  "AppSyncApiName": "fridayapp",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authfridayapp09f13044",
+      "Outputs.UserPoolId"
+    ]
+  }
+}

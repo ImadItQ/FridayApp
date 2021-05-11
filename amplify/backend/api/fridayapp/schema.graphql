@@ -1,0 +1,5 @@
+type Appliance @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  appliance_name: String!
+  appliance_status: String
+}

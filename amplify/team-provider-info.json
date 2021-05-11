@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-fridayapp-dev-215337-authRole",
+      "UnauthRoleArn": "arn:aws:iam::058142629574:role/amplify-fridayapp-dev-215337-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::058142629574:role/amplify-fridayapp-dev-215337-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-fridayapp-dev-215337-deployment",
+      "UnauthRoleName": "amplify-fridayapp-dev-215337-unauthRole",
+      "StackName": "amplify-fridayapp-dev-215337",
+      "StackId": "arn:aws:cloudformation:us-east-2:058142629574:stack/amplify-fridayapp-dev-215337/16eb9040-b1ac-11eb-a62f-0ae4b0720876",
+      "AmplifyAppId": "dlafxv1tg4184"
+    },
+    "categories": {
+      "auth": {
+        "fridayapp09f13044": {}
+      }
+    }
+  }
+}
