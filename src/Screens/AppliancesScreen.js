@@ -9,11 +9,11 @@ import {
   Modal,
   TouchableWithoutFeedback,
 } from "react-native";
-import LogoutButton from "../components/logoutButton";
-import AddButton from "../components/addButton";
-import ApplianceList from "../components/applianceList";
-import DeleteAppliance from "../components/deleteAppliance";
-import Amplify, { Auth, API, graphqlOperation } from "aws-amplify";
+import LogoutButton from "../Components/logoutButton";
+import AddButton from "../Components/addButton";
+import ApplianceList from "../Components/applianceList";
+import DeleteAppliance from "../Components/deleteAppliance";
+import { API, graphqlOperation } from "aws-amplify";
 import { listAppliances } from "../graphql/queries";
 import {
   createAppliance,

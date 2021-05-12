@@ -69,19 +69,6 @@ const Footer = () => {
   );
 };
 export default Footer;
-// export default function Footer() {
-//   return (
-//     <View style={styles.footer}>
-//
-//       <TouchableOpacity style={styles.icon}>
-//
-//       </TouchableOpacity>
-//       <TouchableOpacity style={styles.icon}>
-//
-//       </TouchableOpacity>
-//     </View>
-//   );
-// }
 
 const styles = StyleSheet.create({
   icon: {},

@@ -1,6 +1,6 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import Footer from "./src/components/footer";
+import Footer from "./src/Components/footer";
 import { withAuthenticator } from "aws-amplify-react-native";
 import awsconfig from "../Firday/src/aws-exports";
 import Amplify from "aws-amplify";
