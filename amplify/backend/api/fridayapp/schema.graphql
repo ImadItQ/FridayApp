@@ -2,4 +2,15 @@ type Appliance @model @auth(rules: [{ allow: owner }]) {
   id: ID!
   appliance_name: String!
   appliance_status: String
+  appliance_type: String
+  appliance_room: String
+  heavy_count: Int
+  moderate_count: Int
+  low_count: Int
+}
+
+type Subscription {
+  newOnCreateAppliance: Appliance @aws_subscribe(mutations: ["createAppliance"])
+  newOnUpdateAppliance: Appliance @aws_subscribe(mutations: ["updateAppliance"])
+  newOnDeleteAppliance: Appliance @aws_subscribe(mutations: ["deleteAppliance"])
 }

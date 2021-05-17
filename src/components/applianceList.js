@@ -12,8 +12,13 @@ export default function ApplianceList({
         style={{
           ...styles.item,
           backgroundColor:
-            item.appliance_status == "on"
-              ? "yellow"
+            item.appliance_status == "on" && item.appliance_type == "Heavy"
+              ? "#ff6666"
+              : item.appliance_status == "on" &&
+                item.appliance_type == "Moderate"
+              ? "#66ccff"
+              : item.appliance_status == "on" && item.appliance_type == "Low"
+              ? "#85e085"
               : item.appliance_status == "off"
               ? "white"
               : "white",

@@ -7,6 +7,11 @@ export const getAppliance = /* GraphQL */ `
       id
       appliance_name
       appliance_status
+      appliance_type
+      appliance_room
+      heavy_count
+      moderate_count
+      low_count
       createdAt
       updatedAt
       owner
@@ -24,6 +29,11 @@ export const listAppliances = /* GraphQL */ `
         id
         appliance_name
         appliance_status
+        appliance_type
+        appliance_room
+        heavy_count
+        moderate_count
+        low_count
         createdAt
         updatedAt
         owner
