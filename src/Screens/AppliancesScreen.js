@@ -49,9 +49,12 @@ export default function ApplianceScreen() {
       // console.log("list appliances", ApplianceList);
       setAppliance(ApplianceList);
       for (let i = 0; i < ApplianceList.length; i++) {
-        setHeavyCount(ApplianceList[i].heavy_count);
-        setModerateCount(ApplianceList[i].moderate_count);
-        setLowCount(ApplianceList[i].low_count);
+        ApplianceList[i].low_count > 0 &&
+          setLowCount(ApplianceList[i].low_count);
+        ApplianceList[i].moderate_count > 0 &&
+          setModerateCount(ApplianceList[i].moderate_count);
+        ApplianceList[i].heavy_count > 0 &&
+          setHeavyCount(ApplianceList[i].heavy_count);
       }
     } catch (error) {
       console.log("error:", error);
