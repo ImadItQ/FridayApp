@@ -9,41 +9,97 @@ import {
   Modal,
   TouchableWithoutFeedback,
 } from "react-native";
-import LogoutButton from "../Components/logoutButton";
-import AddButton from "../Components/addButton";
-import ApplianceList from "../Components/applianceList";
-import DeleteAppliance from "../Components/deleteAppliance";
+import LogoutButton from "../components/logoutButton";
+import AddButton from "../components/addButton";
+import ApplianceList from "../components/applianceList";
+import DeleteAppliance from "../components/deleteAppliance";
 import { API, graphqlOperation } from "aws-amplify";
 import { listAppliances } from "../graphql/queries";
+import { Picker } from "@react-native-picker/picker";
 import {
   createAppliance,
   updateAppliance,
   deleteAppliance,
 } from "../graphql/mutations";
+import {
+  newOnCreateAppliance,
+  newOnUpdateAppliance,
+  newOnDeleteAppliance,
+} from "../graphql/subscriptions";
 
 export default function ApplianceScreen() {
   // State Hooks
   const [modalOpen, setModalOpen] = useState(false);
   const [text, setText] = useState("");
+  const [RoomSelected, setRoomSelected] = useState("Hall");
+  const [ApplianceType, setApplianceType] = useState("Heavy");
   const [deleteModal, setDeleteModal] = useState(false);
   const [applianceId, setApplianceId] = useState(0);
   const [appliance, setAppliance] = useState([]);
-
-  useEffect(() => {
-    fetchAppliance();
-  }, []);
+  const [device, setDevice] = useState();
+  const [heavyCount, setHeavyCount] = useState(0);
+  const [moderateCount, setModerateCount] = useState(0);
+  const [lowCount, setLowCount] = useState(0);
 
   //   Fetch the list of Appliances
   const fetchAppliance = async () => {
     try {
       const ApplianceData = await API.graphql(graphqlOperation(listAppliances));
       const ApplianceList = ApplianceData.data.listAppliances.items;
-      console.log("list appliances", ApplianceList);
+      // console.log("list appliances", ApplianceList);
       setAppliance(ApplianceList);
+      for (let i = 0; i < ApplianceList.length; i++) {
+        setHeavyCount(ApplianceList[i].heavy_count);
+        setModerateCount(ApplianceList[i].moderate_count);
+        setLowCount(ApplianceList[i].low_count);
+      }
     } catch (error) {
       console.log("error:", error);
     }
   };
+  useEffect(() => {
+    fetchAppliance();
+  }, []);
+
+  let subscriptionOnCreate;
+  let subscriptionOnUpdate;
+  let subscriptionOnDelete;
+
+  // set subscriptions on create,delete and update
+  const setSubscription = () => {
+    subscriptionOnCreate = API.graphql(
+      graphqlOperation(newOnCreateAppliance)
+    ).subscribe({
+      next: (deviceData) => {
+        setDevice(deviceData.value.data.newOnCreateAppliance);
+      },
+    });
+
+    subscriptionOnUpdate = API.graphql(
+      graphqlOperation(newOnUpdateAppliance)
+    ).subscribe({
+      next: (deviceData) => {
+        setDevice(deviceData.value.data.newOnUpdateAppliance);
+      },
+    });
+
+    subscriptionOnDelete = API.graphql(
+      graphqlOperation(newOnDeleteAppliance)
+    ).subscribe({
+      next: (deviceData) => {
+        setDevice(deviceData.value.data.newOnDeleteAppliance);
+      },
+    });
+  };
+
+  useEffect(() => {
+    setSubscription();
+    return () => {
+      subscriptionOnCreate.unsubscribe();
+      subscriptionOnUpdate.unsubscribe();
+      subscriptionOnDelete.unsubscribe();
+    };
+  }, []);
 
   // Create an Appliance
   const save = async () => {
@@ -51,6 +107,11 @@ export default function ApplianceScreen() {
     const data = {
       appliance_name: text,
       appliance_status: status,
+      appliance_type: ApplianceType,
+      appliance_room: RoomSelected,
+      heavy_count: heavyCount,
+      moderate_count: moderateCount,
+      low_count: lowCount,
     };
     try {
       const result = await API.graphql(
@@ -60,7 +121,6 @@ export default function ApplianceScreen() {
       const updatedAppliance = [...appliance, newAppliance];
       setAppliance(updatedAppliance);
       setModalOpen(false);
-      console.log("success");
     } catch (e) {
       console.log("error:", e);
     }
@@ -97,8 +157,32 @@ export default function ApplianceScreen() {
       let item = component[0];
       if (item.appliance_status == "off") {
         item.appliance_status = "on";
+        if (item.appliance_type == "Heavy") {
+          item.heavy_count = heavyCount + 1;
+          setHeavyCount(item.heavy_count);
+        }
+        if (item.appliance_type == "Moderate") {
+          item.moderate_count = moderateCount + 1;
+          setModerateCount(item.moderate_count);
+        }
+        if (item.appliance_type == "Low") {
+          item.low_count = lowCount + 1;
+          setLowCount(item.low_count);
+        }
       } else if (item.appliance_status == "on") {
         item.appliance_status = "off";
+        if (item.appliance_type == "Heavy" && heavyCount >= 0) {
+          item.heavy_count = heavyCount - 1;
+          setHeavyCount(item.heavy_count);
+        }
+        if (item.appliance_type == "Moderate" && moderateCount >= 0) {
+          item.moderate_count = moderateCount - 1;
+          setModerateCount(item.moderate_count);
+        }
+        if (item.appliance_type == "Low" && lowCount >= 0) {
+          item.low_count = lowCount - 1;
+          setLowCount(item.low_count);
+        }
       }
       delete item.createdAt;
       delete item.updatedAt;
@@ -122,8 +206,16 @@ export default function ApplianceScreen() {
   return (
     <View style={styles.container}>
       <LogoutButton />
-      <View style={styles.headerContainer}>
-        <Text style={styles.header}>Appliances</Text>
+      <View style={styles.headerSide}>
+        <View style={styles.lowBubble}>
+          <Text style={styles.bubbleText}>{lowCount}</Text>
+        </View>
+        <View style={styles.moderateBubble}>
+          <Text style={styles.bubbleText}>{moderateCount}</Text>
+        </View>
+        <View style={styles.heavyBubble}>
+          <Text style={styles.bubbleText}>{heavyCount}</Text>
+        </View>
       </View>
       <Modal
         transparent={true}
@@ -142,6 +234,28 @@ export default function ApplianceScreen() {
                 placeholder="Enter appliance name"
                 onChangeText={changeHandler}
               />
+
+              <Picker
+                selectedValue={RoomSelected}
+                onValueChange={(ItemValue, ItemIndex) =>
+                  setRoomSelected(ItemValue)
+                }
+              >
+                <Picker.Item label="Hall" value="Hall" />
+                <Picker.Item label="Bedroom" value="Bedroom" />
+                <Picker.Item label="Kitchen" value="Kitchen" />
+              </Picker>
+
+              <Picker
+                selectedValue={ApplianceType}
+                onValueChange={(ItemValue, ItemIndex) =>
+                  setApplianceType(ItemValue)
+                }
+              >
+                <Picker.Item label="Heavy" value="Heavy" />
+                <Picker.Item label="Moderate" value="Moderate" />
+                <Picker.Item label="Low" value="Low" />
+              </Picker>
               <TouchableOpacity onPress={save}>
                 <View style={styles.buttonContainer}>
                   <Text style={styles.buttonText}>Save</Text>
@@ -199,13 +313,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#26004d",
   },
-  headerContainer: {
-    top: 40,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   header: {
-    fontSize: 30,
+    fontSize: 20,
     color: "white",
     fontWeight: "700",
   },
@@ -231,7 +340,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingVertical: 30,
     width: "70%",
-    height: "40%",
+    height: "60%",
   },
   input: {
     marginBottom: 10,
@@ -253,5 +362,50 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: "white",
+  },
+  headerSide: {
+    display: "flex",
+    flexDirection: "row",
+    position: "absolute",
+    zIndex: 10,
+    right: 10,
+    top: 30,
+  },
+  bubbleText: {
+    color: "white",
+    fontWeight: "700",
+  },
+  heavyBubble: {
+    width: 30,
+    height: 30,
+    backgroundColor: "#ff6666",
+    marginRight: 10,
+    borderColor: "white",
+    borderWidth: 2,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  moderateBubble: {
+    width: 30,
+    height: 30,
+    backgroundColor: "#66ccff",
+    marginRight: 10,
+    borderColor: "white",
+    borderWidth: 2,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  lowBubble: {
+    width: 30,
+    height: 30,
+    backgroundColor: "#85e085",
+    marginRight: 10,
+    borderColor: "white",
+    borderWidth: 2,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

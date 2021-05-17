@@ -10,6 +10,11 @@ export const createAppliance = /* GraphQL */ `
       id
       appliance_name
       appliance_status
+      appliance_type
+      appliance_room
+      heavy_count
+      moderate_count
+      low_count
       createdAt
       updatedAt
       owner
@@ -25,6 +30,11 @@ export const updateAppliance = /* GraphQL */ `
       id
       appliance_name
       appliance_status
+      appliance_type
+      appliance_room
+      heavy_count
+      moderate_count
+      low_count
       createdAt
       updatedAt
       owner
@@ -40,6 +50,11 @@ export const deleteAppliance = /* GraphQL */ `
       id
       appliance_name
       appliance_status
+      appliance_type
+      appliance_room
+      heavy_count
+      moderate_count
+      low_count
       createdAt
       updatedAt
       owner
